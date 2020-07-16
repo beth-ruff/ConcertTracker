@@ -90,7 +90,9 @@ function createVenue() {
     .then(venue => {
         document.querySelector('#main').innerHTML += `
         <li>
-        <a href='*' data-id='${venue.id}'>${venue.name}</a>
+            <a href='#' data-id='${venue.id}'>${venue.name}</a>
+            <button id="delete" data-id='${venue.id}'>Delete</button>
+            <button id="update-venue" data-id='${venue.id}'>Edit</button>
         </li>
         `
     attachClickToLinks()
@@ -116,4 +118,50 @@ function editVenue() {
     event.preventDefault()
     clearForm()
     let id = event.target.dataset.id 
+    fetch(BASE_URL+`/venues/${id}`)
+    .then(resp => resp.json())
+    .then(venue => {
+        let venueFormDiv = document.getElementById('venue-form')
+        let html = `
+            <form data-id="${id}">
+                <label>Name</label>
+                <input type="text" id="name" value="${venue.name}">
+                <label>Address:</label>
+                <input type="text" id="address" value="${venue.address}">
+                <label>Phone Number:</label>
+                <input type="text" id="phone_number" value="${venue.phone_number}">
+                <input type="submit">
+            </form>
+            `
+        venueFormDiv.innerHTML = html 
+        document.querySelector('form').addEventListener('submit', updateVenue)
+    })
+}
+
+function updateVenue() {
+    event.preventDefault()
+    let id = event.target.dataset.id 
+    const venue = {
+        name: document.getElementById('name').value,
+        address: document.getElementById('address').value,
+        phone_number: document.getElementById('phone_number').value
+    }
+    fetch(BASE_URL+`/venues/${id}`, {
+        method: "PATCH",
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify(venue)
+    })
+    .then(resp => resp.json())
+    .then(venue => {
+        document.querySelector(`li a[data-id="${id}"]`).parentElement.innerHTML= `
+            <a href='#' data-id='${venue.id}'>${venue.name}</a>
+            <button id="delete" data-id='${venue.id}'>Delete</button>
+            <button id="update-venue" data-id='${venue.id}'>Edit</button>
+        `
+        attachClickToLinks()
+        clearForm()
+    })
 }
