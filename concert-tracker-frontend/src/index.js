@@ -14,6 +14,8 @@ function getVenues() {
         main.innerHTML += venues.map(venue => `
             <li>
                 <a href='#' data-id='${venue.id}'>${venue.name}</a>
+                <button id="delete" data-id='${venue.id}'>Delete</button>
+                <button id="update-venue" data-id='${venue.id}'>Edit</button>
             </li>
         `).join('')
 
@@ -33,6 +35,8 @@ function attachClickToLinks() {
     })
     document.getElementById('venue-Form').addEventListener('click', displayCreateForm)
     document.getElementById('venues').addEventListener('click', getVenues)
+    document.querySelectorAll('#delete').forEach(venue => venue.addEventListener('click', removeVenue))
+    document.querySelectorAll('#update-venue').forEach(venue => venue.addEventListener('click', editVenue))
 }
 
 function displayVenue(){
@@ -92,4 +96,24 @@ function createVenue() {
     attachClickToLinks()
     clearForm()
     })
+}
+
+function removeVenue() {
+    event.preventDefault()
+    clearForm()
+    let id = event.target.dataset.id
+    fetch(BASE_URL+'/venues/'+id, {
+        method: "DELETE",
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+    })
+    .then(event.target.parentElement.remove())
+}
+
+function editVenue() {
+    event.preventDefault()
+    clearForm()
+    let id = event.target.dataset.id 
 }
