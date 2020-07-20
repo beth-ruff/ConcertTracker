@@ -21,7 +21,7 @@ function attachClickToLinks() {
     document.querySelectorAll('#delete').forEach(venue => venue.addEventListener('click', removeVenue))
     document.querySelectorAll('#update-venue').forEach(venue => venue.addEventListener('click', editVenue))
     document.querySelectorAll('#add-concert').forEach(concert => concert.addEventListener('click', addConcertForm))
-    document.querySelectorAll('#update-concert').forEach(concert => concert.addEventListener('click', editConcert))
+    // document.querySelectorAll('#update-concert').forEach(concert => concert.addEventListener('click', editConcert))
 }
 
 function getVenues() {
@@ -33,21 +33,18 @@ function getVenues() {
         venues.forEach(venue => {
             let concertString = ""
             venue.concerts.forEach(concert => {
-                let newConcert = new Concert(concert)
-                newConcert.renderConcert()
-                // concertString += `
-                // <li>
-                // <a href='#' data-id='${concert.id}'>${concert.artist}</a>
-                // <button id="delete" data-id="${concert.id}">Delete</button>
-                // <button id="update-concert" data-concert-id='${concert.id}'>Edit</button>
-                // </li>
-                // `
+                concertString += `
+                <li>
+                ${concert.artist}
+                <button id="delete" data-id="${concert.id}">Delete</button>
+                </li>
+                `
             })
             main.innerHTML += `
             <li>
                 <a href='#' data-id='${venue.id}'>${venue.name}</a>
-                <button id="delete" data-id='${venue.id}'>Delete</button>
-                <button id="update-venue" data-id='${venue.id}'>Edit</button>
+                <button id="delete" data-delete-id='${venue.id}'>Delete</button>
+                <button id="update-venue" data-edit-id='${venue.id}'>Edit</button>
                 <button id="add-concert" data-id="${venue.id}">Add Concert</button>
             </li>
             <ul>${concertString}</ul>
@@ -72,20 +69,20 @@ function displayVenue(){
     })
 }
 
-function displayConcert() {
-    clearForm()
-    let id = event.target.dataset.id
-    main.innerHTML = ""
-    fetch(CONCERTS_URL+id)
-    .then(resp => resp.json())
-    .then(concert => {
-        main.innerHTML += `
-        <h3>${concert.artist}</h3>
-        <p><strong>Date:</strong> ${concert.date}</p>
-        <p><strong>Time</strong>: ${concert.time}</p>
-        `
-    })
-}
+// function displayConcert() {
+//     clearForm()
+//     let id = event.target.dataset.id
+//     main.innerHTML = ""
+//     fetch(CONCERTS_URL+id)
+//     .then(resp => resp.json())
+//     .then(concert => {
+//         main.innerHTML += `
+//         <h3>${concert.artist}</h3>
+//         <p><strong>Date:</strong> ${concert.date}</p>
+//         <p><strong>Time</strong>: ${concert.time}</p>
+//         `
+//     })
+// }
 
 function displayCreateForm(){
     let venueFormDiv = document.getElementById('venue-form')
@@ -139,20 +136,25 @@ function createVenue() {
 }
 
 function addConcertForm() {
-    let id = event.target.dataset.id
-    let concertFormDiv = document.querySelector(`#add-concert[data-id="${id}"]`)
+    // let id = event.target.dataset.id
+    // // let concertFormDiv = document.querySelector(`#add-concert[data-id="${id}"]`)
+    // let concertFormDiv = document.createElement('div')
+    // let venueDiv = document.querySelector(`#main li[data-id="${id}"]`)
+    // venueDiv.appendChild(concertFormDiv)
+    let concertForm = document.getElementById('concert-form')
     let html = `
-        <form>
+        <form venue-id="${event.target.dataset.venueId}">
             <label>Artist</label>
             <input type="text" id="artist">
             <label>Date:</label>
             <input type="date" id="date">
             <label>Time:</label>
             <input type="time" id="time">
+            <input type="hidden" id="venue_id" name="venue_id" value="${event.target.dataset.id}">
             <input type="submit">
         </form>
     `
-    concertFormDiv.innerHTML = html 
+    concertForm.innerHTML = html 
     document.querySelector('form').addEventListener('submit', createConcert)
 }
 
@@ -166,9 +168,10 @@ function createConcert() {
     let concert = {
         artist: document.getElementById('artist').value,
         date: document.getElementById('date').value,
-        time: document.getElementById('time').value 
-    }
-    fetch(CONCERTS_URL, {
+        time: document.getElementById('time').value,
+        venue_id: document.getElementById('venue_id').value
+    };
+    fetch(BASE_URL+"/concerts", {
         method: "POST",
         body: JSON.stringify(concert),
         headers: {
@@ -177,16 +180,19 @@ function createConcert() {
         }
     }) 
     .then(resp => resp.json())
-    .then(concert => {
-        document.querySelector('#main').innerHTML += `
-        <ul>
+    .then(data => {
+        let concert = new Concert(data);
+        // let id = event.target.dataset.id
+        let concertDiv = document.querySelector(`#main ul[data-id="${data.venue.id}"`)
+        concertDiv.innerHTML += `
+        <li>
             <a href='#' data-id='${concert.id}'>${concert.artist}</a>
             <button id="delete" data-id='${concert.id}'>Delete</button>
             <button id="update-venue" data-id='${concert.id}'>Edit</button>
-        </ul>
+        </li>
         `
     attachClickToLinks()
-    clearForm()
+    clearConcertForm()
     })
 }
 
