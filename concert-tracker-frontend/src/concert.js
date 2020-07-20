@@ -1,20 +1,20 @@
 class Concert {
-    constructor(artist, date, time, venue_id) {
-        this.artist = artist
-        this.date = date 
-        this.time = time 
-        this.venue_id = venue_id
+    constructor(concert) {
+        this.id = concert.id
+        this.artist = concert.artist
+        this.date = concert.date 
+        this.time = concert.time 
+        this.venue_id = concert.venue.id
     }
 
-    // renderConcert() {
-    //      `
-    //             <li>
-    //             <a href='#' data-id='${this.id}'>${this.artist}</a>
-    //             <button id="delete" data-id="${this.id}">Delete</button>
-    //             <button id="update-concert" data-concert-id='${this.id}'>Edit</button>
-    //             </li>
-    //             `
-    // }
+    renderConcert() {
+         return `
+                <li id="concert-${this.id}">
+                ${this.artist} - ${this.date}
+                <button id="delete-concert" data-id="${this.id}">Delete</button>
+                </li>
+                `
+    }
 
 }
 

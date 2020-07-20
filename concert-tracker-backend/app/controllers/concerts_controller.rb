@@ -1,13 +1,6 @@
 class ConcertsController < ApplicationController
   before_action :set_concert, only: [:show, :update, :destroy]
 
-  # GET /concerts
-  def index
-    @concerts = Concert.all
-
-    render json: @concerts
-  end
-
   # GET /concerts/1
   def show
     render json: @concert
