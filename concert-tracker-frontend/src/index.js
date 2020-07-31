@@ -18,6 +18,25 @@ function attachClickToLinks() {
     document.querySelectorAll('#update-venue').forEach(venue => venue.addEventListener('click', editVenue))
     document.querySelectorAll('#add-concert').forEach(concert => concert.addEventListener('click', addConcertForm))
     document.querySelectorAll('#delete-concert').forEach(concert => concert.addEventListener('click', removeConcert))
+    document.querySelectorAll('#sort-concert').forEach(venue => venue.addEventListener('click', sortConcerts))
+}
+
+function sortConcerts() {
+    let id = event.target.dataset.id
+    let concerts = document.querySelectorAll(`#venueLi-${id} ol li`)
+    let concertsOl = document.querySelector(`#venueLi-${id} ol`)
+    let concertsArr = Array.from(concerts);
+    // concertsArr.sort(function(a, b) {
+    //         if (a.innerHTML < b.innerHTML) {
+    //             return -1;
+    //         }
+    //         if (a.innerHTML > b.innerHTML) {
+    //             return 1;
+    //         }
+    // for (i = 0; i < concertsArr.length; ++i) {
+    //     venue.appendChild(concertsArr[i]);
+    // }
+    concertsArr.sort((a, b) => a.innerHTML > b.innerHTML ? 1 : -1 ).forEach(li => concertsOl.appendChild(li))
 }
 
 function getVenues() {
@@ -49,7 +68,6 @@ function displayVenue(){
         `
     })
 }
-
 
 function displayCreateForm(){
     let venueFormDiv = document.getElementById('venue-form')
@@ -215,9 +233,4 @@ function updateVenue() {
     })
     .then(resp => resp.json())
     .then(data => getVenues());
-    //     let v = new Venue(venue)
-    //     document.querySelector(`#main li a[data-id="${id}"]`).parentElement.innerHTML = v.renderVenue()
-    //     attachClickToLinks()
-    //     clearForm()
-    // })
 }
