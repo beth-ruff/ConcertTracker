@@ -5,39 +5,36 @@ class Venue {
         this.address = venue.address
         this.phone_number = venue.phone_number
         this.concerts = venue.concerts
-        // array.push(this)
+        Venue.array.push(this)
     }
 
-    // static array = []
-
     renderVenue() {
-        return `
-                <li id="venueLi-${this.id}">
-                <a href='#' data-id='${this.id}'>${this.name}</a>
-                <button id="add-concert" data-id="${this.id}">Add Concert</button>
-                <button id="update-venue" data-id='${this.id}'>Edit</button>
-                <button id="delete-venue" data-id="${this.id}">Delete</button>
-                <button id="sort-concert" data-id="${this.id}">Sort Concerts</button>
-                <ol id="concerts-ol"></ol>
-                </li>
+        return `<div class="card mb-4 shadow-sm" id="venueLi-${this.id}">
+                    <div class="card-header">
+                        <a href='#' data-id='${this.id}' class="my-0 font-weight-normal">${this.name}</a><br>
+                        <button class="btn btn-light btn-sm" id="add-concert" data-id="${this.id}">Add Concert</button>
+                        <button class="btn btn-light btn-sm" id="update-venue" data-id='${this.id}'>Edit</button>
+                        <button class="btn btn-light btn-sm" id="delete-venue" data-id="${this.id}">Delete</button>
+                    </div>
+                    <div class="card-body">
+                        <ul id="concerts-ol" class="list-unstyled mt-3 mb-4"></ul>
+                    </div>
+                </div>
                 `
     }
 
     renderConcerts() {
-        let ol = document.querySelector(`#venueLi-${this.id} #concerts-ol`)
-        // let btn = document.createElement("BUTTON");
-        // ol.appendChild(btn);
-        // btn.innerHTML = "Sort Concerts";
-        // btn.id = "sort-concert";
-        // btn.dataset.id=`${this.id}`;
+        let ul = document.querySelector(`#venueLi-${this.id} #concerts-ol`)
         this.concerts.forEach(concert => {
-            ol.innerHTML += `
+            ul.innerHTML += `
                 <li id="concert-${concert.id}">
-                ${concert.artist} - ${concert.date}
-                <button id="delete-concert" data-id="${concert.id}">Delete</button>
+                <small>${concert.artist} - ${concert.date}</small>
+                <button class="btn btn-light btn-sm" id="delete-concert" data-id="${concert.id}">X</button>
                 </li>
                 `
         })
     }
 
 }
+
+Venue.array = [];

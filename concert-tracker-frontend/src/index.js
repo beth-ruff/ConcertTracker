@@ -2,15 +2,16 @@ const BASE_URL = 'http://localhost:3000'
 const VENUES_URL = `${BASE_URL}/venues/`
 const CONCERTS_URL = `${BASE_URL}/concerts/`
 const main = document.querySelector('#main')
+const cards = document.querySelector('.card-deck.mb-3.text-center')
 
 window.addEventListener('load', () => {
     getVenues()
 })
 
 function attachClickToLinks() {
-    let venueLinks = document.querySelectorAll('div li a')
-    venueLinks.forEach(li => {
-        li.addEventListener('click', displayVenue)
+    let venueLinks = document.querySelectorAll('.card-header a')
+    venueLinks.forEach(venue => {
+        venue.addEventListener('click', displayVenue)
     })
     document.getElementById('venue-Form').addEventListener('click', displayCreateForm)
     document.getElementById('venues').addEventListener('click', getVenues)
@@ -19,35 +20,39 @@ function attachClickToLinks() {
     document.querySelectorAll('#add-concert').forEach(concert => concert.addEventListener('click', addConcertForm))
     document.querySelectorAll('#delete-concert').forEach(concert => concert.addEventListener('click', removeConcert))
     document.querySelectorAll('#sort-concert').forEach(venue => venue.addEventListener('click', sortConcerts))
+    document.querySelector('.btn.btn-outline-light.my-2.my-sm-0').addEventListener('click', filterVenues)
 }
 
-function sortConcerts() {
-    let id = event.target.dataset.id
-    let concerts = document.querySelectorAll(`#venueLi-${id} ol li`)
-    let concertsOl = document.querySelector(`#venueLi-${id} ol`)
-    let concertsArr = Array.from(concerts);
-    // concertsArr.sort(function(a, b) {
-    //         if (a.innerHTML < b.innerHTML) {
-    //             return -1;
-    //         }
-    //         if (a.innerHTML > b.innerHTML) {
-    //             return 1;
-    //         }
-    // for (i = 0; i < concertsArr.length; ++i) {
-    //     venue.appendChild(concertsArr[i]);
-    // }
-    concertsArr.sort((a, b) => a.innerHTML > b.innerHTML ? 1 : -1 ).forEach(li => concertsOl.appendChild(li))
+function filterVenues(event) {
+    event.preventDefault();
+    cards.innerHTML = ""
+    let searchBar = document.querySelector('.form-control.mr-sm-2')
+    console.log(Venue.array)
+    let results = Venue.array.filter(obj => obj.name.includes(searchBar.value))
+    console.log(results)
+    results.forEach(result => {
+        cards.innerHTML += result.renderVenue()
+        result.renderConcerts()
+    })
 }
+
+// function sortConcerts() {
+//     let id = event.target.dataset.id
+//     let concerts = document.querySelectorAll(`#venueLi-${id} ol li`)
+//     let concertsOl = document.querySelector(`#venueLi-${id} ol`)
+//     let concertsArr = Array.from(concerts);
+//     concertsArr.sort((a, b) => a.innerHTML > b.innerHTML ? 1 : -1 ).forEach(li => concertsOl.appendChild(li))
+// }
 
 function getVenues() {
     clearForm()
-    main.innerHTML = ""
+    cards.innerHTML = ""
     fetch(BASE_URL+"/venues")
     .then(resp => resp.json())
     .then(venues => {
         venues.forEach(venue => {
             let v = new Venue(venue)
-            main.innerHTML += v.renderVenue()
+            cards.innerHTML += v.renderVenue()
             v.renderConcerts()
         })
         attachClickToLinks()
@@ -57,14 +62,22 @@ function getVenues() {
 function displayVenue(){
     clearForm()
     let id = event.target.dataset.id 
-    main.innerHTML = ""
+    cards.innerHTML = ""
     fetch(VENUES_URL+id)
     .then(resp => resp.json())
     .then(venue => {
-        main.innerHTML += `
-        <h3>${venue.name}</h3>
-        <p><strong>Address:</strong> ${venue.address}</p>
-        <p><strong>Phone Number</strong>: ${venue.phone_number}</p>
+        cards.innerHTML += `
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">${venue.name}</h4><br>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mt-3 mb-4">
+                <li><strong>Address:</strong> ${venue.address}</li><br>
+                <li><strong>Phone Number:</strong> ${venue.phone_number}</li>
+                </ul>
+            </div>
+        </div>
         `
     })
 }
